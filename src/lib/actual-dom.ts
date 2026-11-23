@@ -115,6 +115,8 @@ export const ACCOUNT_BALANCE = byTestId("account-balance");
 export const TRANSACTION_TABLE = byTestId("transaction-table");
 export const TRANSACTION_ROW = `${TRANSACTION_TABLE} ${ROW}`;
 export const TRANSACTION_HEADER = byTestId("transaction-table-header");
+/** The row for a transaction being added, above the table; only there while adding one. */
+export const NEW_TRANSACTION = byTestId("new-transaction");
 export const DATE_CELL = byTestId("date");
 export const ACCOUNT_CELL = byTestId("account");
 export const PAYEE_CELL = byTestId("payee");

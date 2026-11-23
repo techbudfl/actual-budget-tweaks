@@ -56,6 +56,7 @@ import { categoryTemplateInsights } from "./workflows/category-template-insights
 import { incomeBreakdown } from "./workflows/income-breakdown";
 import { keyboardShortcuts } from "./workflows/keyboard-shortcuts";
 import { modernReconcile } from "./workflows/reconcile";
+import { transactionFlags } from "./workflows/transaction-flags";
 import { experimentalSidebar, experimentalSidebarLayout } from "./workflows/sidebar";
 import { customizeSidebarEntry } from "./workflows/sidebar/customize-entry";
 import { liveSidebarNotice } from "./workflows/sidebar/notice";
@@ -179,6 +180,7 @@ export const scriptSections: SettingsSection[] = [
 				items: [
 					alternatingTransactionRows,
 					rowStatus,
+					transactionFlags,
 					tagStyling,
 					resizableTransactionColumns,
 					showDailyAvailable,

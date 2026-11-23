@@ -11,7 +11,13 @@ const log = createLogger("sync");
 /** Actual's synced prefs are one table shared with its own keys; ours never collide. */
 const PREFIX = "abt:";
 /** Settings kept outside any setting's own key; their readers watch storage, so they apply live. */
-const EXTRA_KEYS = ["theme-effects", "category-colors", "abt-account-icons", "abt-category-icons"];
+const EXTRA_KEYS = [
+	"theme-effects",
+	"category-colors",
+	"abt-account-icons",
+	"abt-category-icons",
+	"transaction-flags-last",
+];
 /**
  * The budget's own data, shared by everyone who opens it. Every other synced key is a person's
  * look and feel, kept per user when the server has several (see remoteKey).

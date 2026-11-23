@@ -275,6 +275,87 @@ export default defineUnlistedScript(async () => {
 		});
 	}
 
+	// The account view's selected transaction ids, including rows scrolled out of view. Actual keeps
+	// them in a context whose value is a Set, provided above the table.
+	document.addEventListener("abt:api:selected-transactions", (e) => {
+		const { id } = parseDetail(e);
+		if (!id || !accept(id)) {
+			return;
+		}
+		const table = document.querySelector(TRANSACTION_TABLE);
+		const selected = table
+			? closestFiber(table, (f) => f.memoizedProps?.value instanceof Set, 150)?.memoizedProps.value
+			: null;
+		respond(id, selected ? [...selected].filter((v) => typeof v === "string") : [], null);
+	});
+
+	// The open account view's component instance (AccountInternal), found by a method only it has.
+	function accountView() {
+		const table = document.querySelector(TRANSACTION_TABLE);
+		return table
+			? (closestFiber(
+					table,
+					(f) =>
+						typeof (f.stateNode as { refetchTransactions?: unknown })?.refetchTransactions ===
+						"function",
+					150,
+				)?.stateNode ?? null)
+			: null;
+	}
+
+	// The names of the account view's named filters (chips like Actual's own "Selected
+	// transactions"), set on the table as JSON for features that add one.
+	document.addEventListener("abt:api:mark-filter-names", () => {
+		const table = document.querySelector(TRANSACTION_TABLE);
+		if (!table) {
+			return;
+		}
+		const conditions = accountView()?.state?.filterConditions;
+		const names = (Array.isArray(conditions) ? conditions : [])
+			.map((c) => c?.customName)
+			.filter((name) => typeof name === "string");
+		const value = JSON.stringify(names);
+		if (table.dataset.abtFilterNames !== value) {
+			table.dataset.abtFilterNames = value;
+		}
+	});
+
+	// Swaps named filters on the account view in one step: drops those named in `remove`, then adds
+	// `add` ({ customName, queryFilter }), as Actual's own "Selected transactions" filter is built.
+	// One applyFilters call, as Actual's add and delete each start from the filters before them.
+	document.addEventListener("abt:api:named-filter", (e) => {
+		const { id, remove, add } = parseDetail(e);
+		if (!id || !accept(id)) {
+			return;
+		}
+		const view = accountView();
+		if (!view?.state || typeof view.applyFilters !== "function") {
+			respond(id, false, null);
+			return;
+		}
+		const drop = new Set(Array.isArray(remove) ? remove : []);
+		const kept = (view.state.filterConditions ?? []).filter((c) => !drop.has(c?.customName));
+		const next =
+			typeof add?.customName === "string" && add.queryFilter
+				? [...kept, { customName: add.customName, queryFilter: add.queryFilter }]
+				: kept;
+		// As Actual's own add and delete do: a saved filter shows as changed, and none is left at the end.
+		if (!next.length) {
+			view.setState({ filterId: undefined, filterConditionsOp: "and" });
+		} else if (view.state.filterId) {
+			view.setState((s) => ({ filterId: { ...s.filterId, status: "changed" } }));
+		}
+		Promise.resolve(view.applyFilters(next)).then(
+			() => {
+				if (view.state.search) {
+					view.onSearch?.(view.state.search);
+				}
+				respond(id, true, null);
+			},
+			(err) => respond(id, null, String(err)),
+		);
+	});
+
 	// Actual's account view only reloads its table after its own edits; this has it reload after ours.
 	// Answers false when the view isn't found, so the caller can fall back.
 	document.addEventListener("abt:api:refetch-transactions", (e) => {
@@ -282,16 +363,7 @@ export default defineUnlistedScript(async () => {
 		if (!id || !accept(id)) {
 			return;
 		}
-		const table = document.querySelector(TRANSACTION_TABLE);
-		const view = table
-			? closestFiber(
-					table,
-					(f) =>
-						typeof (f.stateNode as { refetchTransactions?: unknown })?.refetchTransactions ===
-						"function",
-					150,
-				)?.stateNode
-			: null;
+		const view = accountView();
 		if (!view) {
 			respond(id, false, null);
 			return;
@@ -300,6 +372,27 @@ export default defineUnlistedScript(async () => {
 			() => respond(id, true, null),
 			(err) => respond(id, null, String(err)),
 		);
+	});
+
+	// Copies each transaction row's id and notes from its React props onto the row, for features
+	// that read notes the cell doesn't show as stored (tags drawn as pills, a hidden column).
+	document.addEventListener("abt:api:mark-row-notes", () => {
+		for (const row of document.querySelectorAll(`${TRANSACTION_TABLE} ${ROW}`)) {
+			const tx = closestProps(row, (p) => typeof p.transaction?.id === "string")?.transaction;
+			const id = tx?.id;
+			const notes = typeof tx?.notes === "string" ? tx.notes : "";
+			if (!id) {
+				delete row.dataset.abtTxId;
+				delete row.dataset.abtNotes;
+				continue;
+			}
+			if (row.dataset.abtTxId !== id) {
+				row.dataset.abtTxId = id;
+			}
+			if (row.dataset.abtNotes !== notes) {
+				row.dataset.abtNotes = notes;
+			}
+		}
 	});
 
 	// Marks the transaction rows Actual shows as new from a sync or import. That's its rows'
