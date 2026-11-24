@@ -59,6 +59,7 @@ import { keyboardShortcuts } from "./workflows/keyboard-shortcuts";
 import { modernReconcile } from "./workflows/reconcile";
 import { scheduleSort } from "./workflows/schedule-sort";
 import { scheduledDateOrder } from "./workflows/scheduled-date-order";
+import { transactionFlags } from "./workflows/transaction-flags";
 import { experimentalSidebar, experimentalSidebarLayout } from "./workflows/sidebar";
 import { customizeSidebarEntry } from "./workflows/sidebar/customize-entry";
 import { liveSidebarNotice } from "./workflows/sidebar/notice";
@@ -184,6 +185,7 @@ export const scriptSections: SettingsSection[] = [
 					rowStatus,
 					highlightFutureTransactions,
 					scheduledDateOrder,
+					transactionFlags,
 					tagStyling,
 					resizableTransactionColumns,
 					showDailyAvailable,

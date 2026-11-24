@@ -21,6 +21,9 @@ EXTRA_KEYS.push("schedule-sort-order");
 // The scheduled-date-order tweak's key, added here so the list above is left as it was; the
 // tidier way would be to put it in the list.
 EXTRA_KEYS.push("scheduled-in-date-order");
+// The transaction-flags tweak's key, added here so the list above is left as it was; the tidier
+// way would be to put it in the list.
+EXTRA_KEYS.push("transaction-flags-last");
 /**
  * The budget's own data, shared by everyone who opens it. Every other synced key is a person's
  * look and feel, kept per user when the server has several (see remoteKey).

@@ -10,6 +10,7 @@ const AUX_DEFAULTS: Record<string, unknown> = {
 	"local:abt-category-icons": {},
 	"local:future-transactions-color": "#f0fffd",
 	"local:scheduled-in-date-order": true,
+	"local:transaction-flags-last": "🚩",
 	"local:abt-sidebar-shortcuts": [],
 	"local:user-themes": {},
 	"local:side-panel-width": 420,

@@ -178,6 +178,12 @@ const DRAWN = {
 		strokeWidth: 2,
 		body: '<path d="m14 17 4 4 4-4"/><path d="M16 2v3"/><path d="M18 13v8"/><path d="M21 10.354V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h7.343"/><path d="M3 9h18"/><path d="M8 2v3"/>',
 	},
+	/** Lucide's flag, outlined. */
+	flagOutline: {
+		viewBox: "0 0 24 24",
+		strokeWidth: 2,
+		body: '<path d="M4 22V4a1 1 0 0 1 .4-.8A6 6 0 0 1 8 2c3 0 5 2 7.333 2q2 0 3.067-.8A1 1 0 0 1 20 4v10a1 1 0 0 1-.4.8A6 6 0 0 1 16 16c-3 0-5-2-8-2a6 6 0 0 0-4 1.528"/>',
+	},
 	rows: {
 		viewBox: "0 0 24 24",
 		strokeWidth: 1.5,
