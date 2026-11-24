@@ -333,6 +333,14 @@ export function setScheduleOrder(order: Record<string, unknown>[] | null): Promi
 	return request("abt:api:schedule-order", { order });
 }
 
+/**
+ * Shows the open account view's scheduled transactions among the rest in date order (true), or on
+ * top as Actual does (false); null lets go of the view. False when there's no account view open.
+ */
+export function setScheduledDateOrder(inOrder: boolean | null): Promise<boolean> {
+	return request("abt:api:scheduled-date-order", { inOrder });
+}
+
 /** Has the open account view reload its transactions in place; false when there's none to reload. */
 export function refetchTransactions(): Promise<boolean> {
 	return request("abt:api:refetch-transactions", {});
