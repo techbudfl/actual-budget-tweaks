@@ -94,19 +94,42 @@ function colorTags(els: HTMLElement[]) {
 	});
 }
 
+const textOf = (el: Element) =>
+	[...el.childNodes].find((n): n is Text => n.nodeType === Node.TEXT_NODE && !!n.nodeValue?.trim());
+
+function trimHash(node: Text) {
+	const text = node.nodeValue?.trimStart() ?? "";
+	if (text.startsWith("#")) {
+		node.nodeValue = text.slice(1);
+	}
+}
+
+// React keeps writing a tag's name into its own text node, which stays on the page: only the "#"
+// moves into a span. When React writes a new tag there (a pill reused for another tag), its "#"
+// is taken off again; replacing the node would leave the pill showing the old tag.
+const tagTexts = new MutationObserver((records) => {
+	for (const record of records) {
+		trimHash(record.target as Text);
+	}
+});
+
 function splitHash(el: HTMLElement) {
-	const text = el.textContent?.trim() || "";
-	if (!text.startsWith("#")) {
+	const node = textOf(el);
+	if (!node?.nodeValue?.trimStart().startsWith("#")) {
 		return;
 	}
-
 	const hash = document.createElement("span");
 	hash.className = "abt-tag-hash";
 	hash.textContent = "#";
-
-	el.textContent = text.slice(1);
-	el.prepend(hash);
+	node.before(hash);
+	trimHash(node);
+	tagTexts.observe(node, { characterData: true });
 }
+
+/** A styled tag whose text React has since replaced outright, so its "#" span is gone. */
+const lostHash = (el: Element) =>
+	!el.querySelector(":scope > .abt-tag-hash") &&
+	!!textOf(el)?.nodeValue?.trimStart().startsWith("#");
 
 /** Actual renders a tag as its button's own text; reading only that skips every other button's subtree. */
 function isTagButton(btn: HTMLButtonElement): boolean {
@@ -120,6 +143,9 @@ function scanTags() {
 		'button[data-react-aria-pressable="true"]',
 	)) {
 		if (btn.hasAttribute(ATTR)) {
+			if (lostHash(btn)) {
+				splitHash(btn);
+			}
 			if (needsColors(btn)) {
 				stale.push(btn);
 			}
@@ -153,6 +179,9 @@ function scanTags() {
 			continue;
 		}
 		if (item.hasAttribute(ATTR)) {
+			if (lostHash(textEl)) {
+				splitHash(textEl);
+			}
 			if (needsColors(textEl)) {
 				stale.push(textEl);
 			}
@@ -166,14 +195,20 @@ function scanTags() {
 }
 
 function restoreHash(el: HTMLElement) {
-	const hash = el.querySelector(".abt-tag-hash");
-	if (hash) {
-		const text = "#" + (el.textContent?.trim() || "");
-		el.textContent = text;
+	const hash = el.querySelector(":scope > .abt-tag-hash");
+	if (!hash) {
+		return;
+	}
+	hash.remove();
+	const node = textOf(el);
+	if (node && !node.nodeValue?.trimStart().startsWith("#")) {
+		node.nodeValue = `#${node.nodeValue}`;
 	}
 }
 
 function cleanup() {
+	// Before the "#"s go back, or it would take them off again.
+	tagTexts.disconnect();
 	for (const el of document.querySelectorAll<HTMLElement>(`[${ATTR}]`)) {
 		if (el.getAttribute(ATTR) === "mobile") {
 			el.style.removeProperty("background-color");
