@@ -526,6 +526,12 @@
 				"platform": "desktop",
 				"label": "Highlight future transactions",
 				"description": "Tints transactions dated after today.",
+				"icon": "calendar",
+				"group": null,
+				"writes": null,
+				"experimental": false
+			},
+			{
 				"key": "scheduled-date-order",
 				"type": "checkbox",
 				"defaultValue": false,
@@ -535,6 +541,9 @@
 				"icon": "calendar",
 				"group": null,
 				"writes": null,
+				"experimental": false
+			},
+			{
 				"key": "transaction-flags",
 				"type": "checkbox",
 				"defaultValue": false,
