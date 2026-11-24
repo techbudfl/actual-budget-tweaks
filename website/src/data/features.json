@@ -520,6 +520,18 @@
 				"experimental": false
 			},
 			{
+				"key": "transaction-flags",
+				"type": "checkbox",
+				"defaultValue": false,
+				"platform": "desktop",
+				"label": "Transaction flags",
+				"description": "Flag a transaction with a click beside its date; a Flagged button shows only those.",
+				"icon": "flag",
+				"group": null,
+				"writes": "Adds or removes the flag's tag (#🚩) in a transaction's notes when you click it.",
+				"experimental": false
+			},
+			{
 				"key": "tag-styling",
 				"type": "checkbox",
 				"defaultValue": true,

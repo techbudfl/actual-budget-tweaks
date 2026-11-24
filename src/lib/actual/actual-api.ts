@@ -325,6 +325,11 @@ export function navigate(path: string | number, options?: Record<string, unknown
 	);
 }
 
+/** The open account view's selected transaction ids, rows out of view included; [] when none. */
+export function selectedTransactions(): Promise<string[]> {
+	return request("abt:api:selected-transactions", {});
+}
+
 /** Has the open account view reload its transactions in place; false when there's none to reload. */
 export function refetchTransactions(): Promise<boolean> {
 	return request("abt:api:refetch-transactions", {});
@@ -388,6 +393,27 @@ export function onSyncingAccounts(callback: (ids: Set<string>) => void): () => v
 }
 
 /** Tags the items of Actual's open menus with `data-abt-menu-key`, their untranslated names. */
+/**
+ * Swaps named filters on the open account view: drops those named in `remove`, then adds `add`, a
+ * chip named `customName` showing the transactions `queryFilter` matches. False with no view open.
+ */
+export function setNamedFilter(
+	remove: string[],
+	add: { customName: string; queryFilter: Record<string, unknown> } | null,
+): Promise<boolean> {
+	return request("abt:api:named-filter", { remove, add });
+}
+
+/** Sets the transaction table's data-abt-filter-names to its named filters, as JSON. */
+export function markFilterNames(): void {
+	document.dispatchEvent(new CustomEvent("abt:api:mark-filter-names"));
+}
+
+/** Sets each transaction row's data-abt-tx-id and data-abt-notes from Actual's own data. */
+export function markRowNotes(): void {
+	document.dispatchEvent(new CustomEvent("abt:api:mark-row-notes"));
+}
+
 export function markMenuKeys(): void {
 	document.dispatchEvent(new CustomEvent("abt:api:mark-menu-keys"));
 }
